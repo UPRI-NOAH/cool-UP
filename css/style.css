@@ -251,6 +251,9 @@ html, body {
   opacity: 0.8;
 }
 .chip.off .count { background: #f0f0f0; }
+.chip .label-short { display: none; }
+
+
 
 /* ================================================================
    FAB — Locate me
@@ -592,4 +595,55 @@ html, body {
 @media (prefers-reduced-motion: reduce) {
   #btn-locate, .cool-pin, .chip { transition: none; }
   .toast { animation: none; }
+}
+
+/* ================================================================
+   PHONES: filters become a full-width 5-up bar; locate button sits above it
+================================================================ */
+@media (max-width: 600px) {
+  :root { --dock-h: 58px; }
+
+  #filters {
+    left: 8px; right: 8px;
+    bottom: calc(10px + var(--safe-bottom));
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    padding: 0;
+    overflow: visible;
+    -webkit-mask-image: none;
+            mask-image: none;
+  }
+
+  .chip {
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    min-width: 0;
+    height: var(--dock-h);
+    padding: 6px 2px;
+    border-radius: 14px;
+    font-size: 11px;
+    line-height: 1.1;
+  }
+  .chip .chip-icon  { font-size: 18px; line-height: 1; }
+  .chip .label-long { display: none; }
+  .chip .label-short {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .chip .count { display: none; }
+
+  #btn-locate {
+    width: 52px; height: 52px;
+    right: calc(14px + var(--safe-right));
+    bottom: calc(10px + var(--dock-h) + 14px + var(--safe-bottom));
+  }
+
+  .toast { bottom: calc(10px + var(--dock-h) + 80px + var(--safe-bottom)); }
+  .leaflet-bottom.leaflet-right { margin-bottom: calc(10px + var(--dock-h) + 4px + var(--safe-bottom)); }
+  .leaflet-bottom.leaflet-left  { margin-bottom: calc(10px + var(--dock-h) + 4px + var(--safe-bottom)); }
 }

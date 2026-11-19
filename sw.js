@@ -5,7 +5,7 @@
    - Map tiles: cached as you browse (capped), so visited areas work offline
    Bump VERSION whenever app files change so clients pick up the update.
 ================================================================ */
-const VERSION = 'v1';
+const VERSION = 'v2';
 const SHELL_CACHE = `coolup-shell-${VERSION}`;
 const CDN_CACHE   = 'coolup-cdn';
 const TILE_CACHE  = 'coolup-tiles';

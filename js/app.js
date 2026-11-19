@@ -64,7 +64,7 @@ function loadPlaces() {
       className: 'cool-popup',
       // Keep popups clear of the top bar and the bottom chips/button
       autoPanPaddingTopLeft: L.point(12, 80),
-      autoPanPaddingBottomRight: L.point(12, 100),
+      autoPanPaddingBottomRight: L.point(12, window.innerWidth <= 600 ? 145 : 100),
     });
     layersByType.get(f.type).push(marker);
     places.push({ ...f, marker });
@@ -190,7 +190,11 @@ function buildFilterChips() {
     chip.className = 'chip';
     chip.style.setProperty('--chip-color', cat.color);
     chip.setAttribute('aria-pressed', 'true');
-    chip.innerHTML = `<span aria-hidden="true">${cat.icon}</span>${escapeHtml(cat.label)}<span class="count">${count}</span>`;
+    chip.setAttribute('aria-label', `${cat.label} (${count})`);
+    chip.innerHTML = `<span class="chip-icon" aria-hidden="true">${cat.icon}</span>` +
+                     `<span class="label-long">${escapeHtml(cat.label)}</span>` +
+                     `<span class="label-short">${escapeHtml(cat.short || cat.label)}</span>` +
+                     `<span class="count">${count}</span>`;
     chip.addEventListener('click', () => {
       const on = !activeTypes.has(type);
       if (on) activeTypes.add(type); else activeTypes.delete(type);

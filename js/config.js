@@ -23,10 +23,10 @@ const CONFIG = Object.freeze({
 
   // Provisional `cool_up:type` values. Order = chip order.
   CATEGORIES: {
-    green:  { label: 'Green & shaded',  icon: '🌳', color: '#2d8a4e', blurb: 'Parks, gardens, groves and forests: natural shade and cooler air.' },
-    indoor: { label: 'Indoor & cool',   icon: '📚', color: '#1f6fd1', blurb: 'Libraries, museums, malls and halls, often air-conditioned.' },
-    water:  { label: 'Water',           icon: '💧', color: '#0aa2c0', blurb: 'Drinking fountains, pools and ponds to rehydrate or cool off.' },
-    food:   { label: 'Food & drinks',   icon: '🥤', color: '#b26a00', blurb: 'Cafés and canteens for a cold drink and a seat out of the sun.' },
-    shade:  { label: 'Shelter',         icon: '⛱️', color: '#7a5cc2', blurb: 'Covered shelters, chapels and sports halls with a roof overhead.' },
+    green:  { label: 'Green & shaded', short: 'Green',  icon: '🌳', color: '#2d8a4e', blurb: 'Parks, gardens, groves and forests: natural shade and cooler air.' },
+    indoor: { label: 'Indoor & cool', short: 'Indoor',   icon: '📚', color: '#1f6fd1', blurb: 'Libraries, museums, malls and halls, often air-conditioned.' },
+    water:  { label: 'Water', short: 'Water',           icon: '💧', color: '#0aa2c0', blurb: 'Drinking fountains, pools and ponds to rehydrate or cool off.' },
+    food:   { label: 'Food & drinks', short: 'Food',   icon: '🥤', color: '#b26a00', blurb: 'Cafés and canteens for a cold drink and a seat out of the sun.' },
+    shade:  { label: 'Shelter', short: 'Shelter',         icon: '⛱️', color: '#7a5cc2', blurb: 'Covered shelters, chapels and sports halls with a roof overhead.' },
   },
 });

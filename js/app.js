@@ -221,43 +221,74 @@ function closeAbout() {
 // ---- Locate me: show position + nearest heat-relief spots ----
 
 function locateMe() {
+  // Browsers only expose location on https:// (or localhost). On plain http,
+  // e.g. testing from a phone via the computer's LAN IP, it fails instantly.
+  if (!window.isSecureContext) {
+    showToast('Location needs a secure (https://) link. It will work once the site is live.', 'error', 7000);
+    return;
+  }
   if (!navigator.geolocation) {
     showToast('Location is not supported by your browser.', 'error');
     return;
   }
+
   const btn = document.getElementById('btn-locate');
   btn.disabled = true;
+  const done = () => { btn.disabled = false; };
 
+  const onError = (err) => {
+    done();
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    let msg;
+    if (err.code === err.PERMISSION_DENIED) {
+      msg = isIOS
+        ? 'Location is blocked. Turn on Settings → Privacy & Security → Location Services, and allow it for Safari Websites.'
+        : 'Location is blocked. Tap the icon next to the address bar and allow Location for this site.';
+    } else if (err.code === err.TIMEOUT) {
+      msg = 'Finding your location took too long. Try again, ideally near a window or outdoors.';
+    } else {
+      msg = 'Could not get your location. Check that Location / GPS is turned on.';
+    }
+    showToast(msg, 'error', 8000);
+  };
+
+  // Try precise GPS first; indoors this often times out, so fall back to
+  // the faster network-based position before giving up.
   navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      btn.disabled = false;
-      const here = L.latLng(pos.coords.latitude, pos.coords.longitude);
-      if (meMarker) map.removeLayer(meMarker);
-      meMarker = L.marker(here, {
-        icon: L.divIcon({ className: '', html: '<div class="me-dot"></div>', iconSize: [18, 18], iconAnchor: [9, 9] }),
-        interactive: false,
-      }).addTo(map);
-
-      const nearest = places
-        .filter((p) => activeTypes.has(p.type))
-        .map((p) => ({ p, d: here.distanceTo([p.lat, p.lng]) }))
-        .sort((a, b) => a.d - b.d)[0];
-
-      if (nearest && nearest.d < 3000) {
-        map.fitBounds(L.latLngBounds([here, [nearest.p.lat, nearest.p.lng]]).pad(0.4), { maxZoom: 18 });
-        clusterLayer.zoomToShowLayer(nearest.p.marker, () => nearest.p.marker.openPopup());
-        showToast(`Nearest cool spot: ${Math.round(nearest.d)} m away`, 'success');
-      } else {
-        map.setView(here, 16);
-        showToast('No mapped heat-relief spots within 3 km yet.', 'info');
-      }
+    (pos) => { done(); showNearest(pos); },
+    (err) => {
+      if (err.code === err.PERMISSION_DENIED) return onError(err);
+      navigator.geolocation.getCurrentPosition(
+        (pos) => { done(); showNearest(pos); },
+        onError,
+        { enableHighAccuracy: false, timeout: 15000, maximumAge: 300000 }
+      );
     },
-    () => {
-      btn.disabled = false;
-      showToast('Could not get your location.', 'error');
-    },
-    { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+    { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
   );
+}
+
+function showNearest(pos) {
+  const here = L.latLng(pos.coords.latitude, pos.coords.longitude);
+  if (meMarker) map.removeLayer(meMarker);
+  meMarker = L.marker(here, {
+    icon: L.divIcon({ className: '', html: '<div class="me-dot"></div>', iconSize: [18, 18], iconAnchor: [9, 9] }),
+    interactive: false,
+  }).addTo(map);
+
+  const nearest = places
+    .filter((p) => activeTypes.has(p.type))
+    .map((p) => ({ p, d: here.distanceTo([p.lat, p.lng]) }))
+    .sort((a, b) => a.d - b.d)[0];
+
+  if (nearest && nearest.d < 3000) {
+    map.fitBounds(L.latLngBounds([here, [nearest.p.lat, nearest.p.lng]]).pad(0.4), { maxZoom: 18 });
+    clusterLayer.zoomToShowLayer(nearest.p.marker, () => nearest.p.marker.openPopup());
+    showToast(`Nearest cool spot: ${Math.round(nearest.d)} m away`, 'success');
+  } else {
+    map.setView(here, 16);
+    showToast('No mapped heat-relief spots within 3 km yet.', 'info');
+  }
 }
 
 // ================================================================
@@ -393,10 +424,10 @@ function escapeHtml(str) {
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-function showToast(msg, type = 'info') {
+function showToast(msg, type = 'info', duration = 4500) {
   const toast = document.getElementById('toast');
   toast.textContent = msg;
   toast.className = `toast toast-${type}`;
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { toast.className = 'toast hidden'; }, 4500);
+  toastTimer = setTimeout(() => { toast.className = 'toast hidden'; }, duration);
 }

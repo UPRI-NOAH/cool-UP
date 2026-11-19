@@ -436,7 +436,8 @@ html, body {
 .toast {
   position: fixed;
   bottom: calc(90px + var(--safe-bottom));
-  max-width: calc(100vw - 32px);
+  width: max-content;
+  max-width: min(440px, calc(100vw - 32px));
   text-align: center;
   left: 50%;
   transform: translateX(-50%);
@@ -444,7 +445,8 @@ html, body {
   background: #1a1a2e;
   color: white;
   padding: 12px 24px;
-  border-radius: 100px;
+  border-radius: 18px;
+  line-height: 1.4;
   font-size: 14px;
   font-weight: 500;
   box-shadow: var(--shadow-md);

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Cool UP — find heat-relief spaces (parks, libraries, shade, water) across University of the Philippines campuses.">
+  <title>Cool UP — Heat-Relief Map</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌳</text></svg>">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
+  <!-- Marker clustering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+  <!-- App styles -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ============================================================
+       MAP (full-screen background layer)
+  ============================================================ -->
+  <div id="map"></div>
+
+  <!-- ============================================================
+       TOP BAR
+  ============================================================ -->
+  <header id="topbar">
+    <div id="topbar-title">
+      <span aria-hidden="true">🌳</span>
+      <span class="title-text">
+        <span class="title-main">Cool <span class="up">UP</span></span>
+        <span class="title-sub">Beat the heat this El Niño</span>
+      </span>
+    </div>
+    <div id="topbar-actions">
+      <select id="campus-select" aria-label="Jump to campus"></select>
+      <button id="btn-search-toggle" class="icon-btn" aria-label="Search heat-relief spaces" title="Search">🔍</button>
+      <button id="btn-about" class="icon-btn" aria-label="About Cool UP" title="About">ℹ️</button>
+    </div>
+  </header>
+
+  <!-- Search bar (hidden until toggle) -->
+  <div id="search-bar" class="hidden">
+    <input id="search-input" type="search" placeholder="Search parks, libraries, buildings…" autocomplete="off">
+    <div id="search-results" class="hidden" role="listbox"></div>
+  </div>
+
+  <!-- ============================================================
+       CATEGORY FILTERS
+  ============================================================ -->
+  <nav id="filters" aria-label="Filter by type of space"></nav>
+
+  <!-- ============================================================
+       FAB — Locate me
+  ============================================================ -->
+  <button id="btn-locate" aria-label="Find heat-relief spaces near me" title="Near me">
+    <svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="7"/>
+      <circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/>
+      <line x1="12" y1="1.5" x2="12" y2="5"/>
+      <line x1="12" y1="19" x2="12" y2="22.5"/>
+      <line x1="1.5" y1="12" x2="5" y2="12"/>
+      <line x1="19" y1="12" x2="22.5" y2="12"/>
+    </svg>
+  </button>
+
+  <!-- ============================================================
+       ABOUT MODAL
+  ============================================================ -->
+  <div id="about-modal" class="hidden" role="dialog" aria-modal="true" aria-labelledby="about-heading">
+    <div id="about-card">
+      <div id="about-icon">🌳❄️</div>
+      <h2 id="about-heading">Welcome to Cool <span class="up">UP</span></h2>
+      <p class="tagline">Beat the heat this El Niño 🌡️</p>
+      <p class="lede">
+        A map of places to cool down across University of the Philippines
+        campuses: shade, greenery, air-conditioned rooms, and drinking water.
+      </p>
+      <ul id="about-list"></ul>
+      <p class="fineprint">
+        Pins come from <strong>OpenStreetMap</strong>. Each one is labelled with a
+        provisional <code>cool_up:type</code> tag while the community tagging
+        scheme is finalised. Crowd-sourced contributions are coming soon. Know a
+        spot that's missing? Add it to OpenStreetMap and it will show up here.
+      </p>
+      <p class="credits">
+        An initiative of <strong>UPRI</strong> (UP Resilience Institute) and
+        <strong>UPRI YouthMappers</strong> for El Niño preparedness. Collaboration with UP campuses is ongoing.
+      </p>
+      <button id="btn-about-close" class="btn-primary btn-full">Explore the map</button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       TOAST NOTIFICATION
+  ============================================================ -->
+  <div id="toast" role="status" aria-live="polite" class="toast hidden"></div>
+
+  <!-- ============================================================
+       SCRIPTS
+  ============================================================ -->
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <script src="js/config.js"></script>
+  <script src="data/heat-relief.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>

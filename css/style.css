@@ -1,0 +1,542 @@
+/* ================================================================
+   Cool UP — Styles
+   Same layout system as the Community Pantry Map, recoloured with a
+   cool palette. Mobile-first, then desktop overrides.
+================================================================ */
+
+/* ---- Reset & tokens ---- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+.hidden { display: none !important; }
+
+:root {
+  --brand-dark:  #0b5d75;
+  --brand-mid:   #1283a3;
+  --brand-light: #4fb3cf;
+  --brand-pale:  #d9f1f7;
+  --up-maroon:   #7b1113;
+  --text:        #1a1a2e;
+  --text-muted:  #6c757d;
+  --border:      #dee2e6;
+  --surface:     #ffffff;
+  --error:       #dc3545;
+  --radius:      12px;
+  --shadow-sm:   0 2px 8px rgba(0,0,0,0.12);
+  --shadow-md:   0 4px 20px rgba(0,0,0,0.18);
+  --topbar-h:    52px;
+
+  /* Category colours */
+  --cat-green:   #2d8a4e;
+  --cat-indoor:  #1f6fd1;
+  --cat-food:    #b26a00;
+  --cat-water:   #0aa2c0;
+  --cat-shade:   #7a5cc2;
+}
+
+html, body {
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 15px;
+  color: var(--text);
+  overflow: hidden;
+  background: #e3ecef;
+}
+
+/* ================================================================
+   MAP
+================================================================ */
+#map {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+}
+
+/* ================================================================
+   TOP BAR
+================================================================ */
+#topbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--topbar-h);
+  z-index: 500;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 12px 0 16px;
+}
+
+#topbar-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--brand-dark);
+  white-space: nowrap;
+}
+#topbar-title span:first-child { font-size: 20px; }
+#topbar-title .up { color: var(--up-maroon); }
+#topbar-title .title-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+#topbar-title .title-sub {
+  font-size: 11px;
+  font-weight: 600;
+  font-style: italic;
+  color: #d9480f;
+}
+
+#topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+#campus-select {
+  min-width: 0;
+  max-width: 46vw;
+  padding: 6px 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--brand-dark);
+  background: var(--brand-pale);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: background 0.2s;
+  opacity: 0.75;
+}
+.icon-btn:hover { background: #f0f0f0; opacity: 1; }
+
+/* ---- Search bar ---- */
+#search-bar {
+  position: fixed;
+  top: var(--topbar-h);
+  left: 0; right: 0;
+  z-index: 490;
+  padding: 8px 12px;
+  background: white;
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+#search-input {
+  width: 100%;
+  padding: 9px 14px;
+  font-size: 15px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  outline: none;
+  background: #f8f9fa;
+}
+#search-input:focus { border-color: var(--brand-light); background: white; }
+
+#search-results {
+  position: absolute;
+  top: calc(100% - 8px);
+  left: 12px; right: 12px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 0 0 10px 10px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+  max-height: 260px;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+.search-section-header {
+  padding: 6px 14px 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  background: #f8f9fa;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.search-result-item {
+  padding: 10px 14px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 14px;
+}
+.search-result-item:last-child { border-bottom: none; }
+.search-result-item:hover { background: var(--brand-pale); }
+.search-result-item strong { display: block; color: var(--text); }
+.search-result-item span { color: var(--text-muted); font-size: 12px; }
+.search-no-results {
+  padding: 14px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+/* ================================================================
+   CATEGORY FILTER CHIPS (bottom, horizontally scrollable)
+================================================================ */
+#filters {
+  position: fixed;
+  left: 0; right: 80px;
+  bottom: 24px;
+  z-index: 500;
+  display: flex;
+  gap: 8px;
+  padding: 0 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+#filters::-webkit-scrollbar { display: none; }
+
+.chip {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 100px;
+  border: 2px solid var(--chip-color, var(--brand-mid));
+  background: var(--chip-color, var(--brand-mid));
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: background 0.2s, color 0.2s, opacity 0.2s;
+}
+.chip .count {
+  background: rgba(255,255,255,0.25);
+  border-radius: 100px;
+  padding: 0 6px;
+  font-size: 11px;
+}
+.chip.off {
+  background: white;
+  color: var(--chip-color, var(--brand-mid));
+  opacity: 0.8;
+}
+.chip.off .count { background: #f0f0f0; }
+
+/* ================================================================
+   FAB — Locate me
+================================================================ */
+#btn-locate {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 500;
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: var(--brand-mid);
+  color: white;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+  transition: background 0.2s, transform 0.15s;
+  display: flex; align-items: center; justify-content: center;
+}
+#btn-locate:hover  { background: var(--brand-dark); transform: scale(1.05); }
+#btn-locate:active { transform: scale(0.95); }
+#btn-locate:disabled { opacity: 0.6; cursor: wait; }
+
+/* ================================================================
+   BUTTONS
+================================================================ */
+.btn-primary {
+  background: var(--brand-mid);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+}
+.btn-primary:hover  { background: var(--brand-dark); }
+.btn-primary:active { opacity: 0.85; }
+.btn-full { width: 100%; }
+
+/* ================================================================
+   ABOUT MODAL (same card design as the pantry consent modal)
+================================================================ */
+#about-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 800;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 16px;
+}
+@media (min-width: 769px) {
+  #about-modal { align-items: center; }
+}
+
+#about-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 28px 24px 24px;
+  width: 100%;
+  max-width: 440px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  box-shadow: var(--shadow-md);
+}
+
+#about-icon {
+  font-size: 36px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+#about-card h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--brand-dark);
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+#about-card h2 .up { color: var(--up-maroon); font-weight: 800; }
+
+#about-card .tagline {
+  font-size: 14px;
+  font-weight: 600;
+  font-style: italic;
+  color: #d9480f;
+  text-align: center;
+  margin: -2px 0 10px;
+}
+
+#about-card .credits {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text);
+  text-align: center;
+  background: #f9eeee;
+  border: 1px solid #ecd2d3;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 16px;
+}
+#about-card .credits strong { color: var(--up-maroon); }
+
+#about-card .lede {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-muted);
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+#about-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+#about-list li {
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.45;
+  padding: 10px 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid var(--chip-color, var(--brand-mid));
+}
+
+#about-card .fineprint {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.45;
+  margin-bottom: 16px;
+}
+#about-card code {
+  font-size: 11.5px;
+  background: var(--brand-pale);
+  color: var(--brand-dark);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+/* ================================================================
+   TOAST
+================================================================ */
+.toast {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 900;
+  background: #1a1a2e;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 100px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: var(--shadow-md);
+  animation: toast-in 0.3s ease;
+}
+.toast.hidden { display: none; }
+.toast.toast-success { background: var(--brand-dark); }
+.toast.toast-error   { background: var(--error); }
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translate(-50%, 12px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* ================================================================
+   LEAFLET OVERRIDES
+================================================================ */
+.leaflet-top .leaflet-control-zoom {
+  margin-top: calc(var(--topbar-h) + 8px);
+}
+.leaflet-bottom.leaflet-right { margin-bottom: 84px; }
+
+/* Heat-relief marker */
+.cool-pin {
+  width: 32px; height: 32px;
+  border: 3px solid white;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+  transition: transform 0.15s;
+  cursor: pointer;
+  background: var(--pin-color, var(--brand-mid));
+}
+.cool-pin:hover { transform: scale(1.15); }
+
+/* "You are here" dot */
+.me-dot {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: #1f6fd1;
+  border: 3px solid white;
+  box-shadow: 0 0 0 6px rgba(31,111,209,0.25), 0 2px 6px rgba(0,0,0,0.4);
+}
+
+/* Clusters in brand colours instead of Leaflet's default green/yellow/orange */
+.marker-cluster-small, .marker-cluster-medium, .marker-cluster-large {
+  background-color: rgba(79, 179, 207, 0.45);
+}
+.marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div {
+  background-color: rgba(18, 131, 163, 0.85);
+  color: white;
+  font-weight: 700;
+}
+
+/* Popup */
+.cool-popup .leaflet-popup-content-wrapper {
+  border-radius: 12px;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.15);
+}
+.cool-popup .leaflet-popup-content {
+  margin: 0;
+  min-width: 220px;
+}
+
+.popup-band {
+  height: 6px;
+  background: var(--pin-color, var(--brand-mid));
+}
+
+.popup-body {
+  padding: 12px 14px 10px;
+}
+
+.popup-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+
+.popup-row {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+.popup-row a {
+  color: var(--brand-mid);
+  text-decoration: none;
+  word-break: break-all;
+}
+.popup-row a:hover { text-decoration: underline; }
+
+.popup-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+  background: var(--pin-color, var(--brand-mid));
+}
+
+.popup-tags {
+  margin-top: 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10.5px;
+  color: #888;
+  line-height: 1.5;
+  word-break: break-all;
+}
+
+/* ================================================================
+   DESKTOP
+================================================================ */
+@media (min-width: 769px) {
+  .toast { bottom: 30px; }
+  #filters { right: 90px; padding-left: 16px; }
+}
+
+/* Phones: compact top bar so title, campus picker and buttons all fit */
+@media (max-width: 480px) {
+  #topbar { padding: 0 6px 0 12px; }
+  #topbar-title { gap: 6px; }
+  #topbar-title .title-sub { font-size: 10px; }
+  #topbar-actions { gap: 0; }
+  #campus-select { max-width: 28vw; font-size: 12px; padding: 6px 4px; }
+  .icon-btn { font-size: 18px; padding: 4px 5px; }
+}
+/* Very narrow phones: drop the tree icon, keep the title + El Niño line */
+@media (max-width: 380px) {
+  #topbar-title > span:first-child { display: none; }
+}
+
+/* ================================================================
+   ACCESSIBILITY: reduced motion
+================================================================ */
+@media (prefers-reduced-motion: reduce) {
+  #btn-locate, .cool-pin, .chip { transition: none; }
+  .toast { animation: none; }
+}

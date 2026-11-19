@@ -16,6 +16,20 @@ El Niño preparedness. Collaboration with UP campuses is ongoing.
 
 Crowd-sourced contributions are planned for a later release.
 
+## Install as an app (PWA)
+
+Cool UP is a Progressive Web App:
+
+- **Android / Chrome:** open the site, tap ℹ️, then **Install Cool UP on your phone**
+  (or use the browser's *Install app* menu item).
+- **iPhone / iPad:** open in Safari → **Share** → **Add to Home Screen**.
+
+Once installed it opens full-screen, and works offline: the app, the heat-relief
+data and the map tiles you've already viewed are all cached.
+
+**When you change any app file,** bump `VERSION` in `sw.js` so installed copies
+pick up the update. To regenerate the icons: `python3 tools/make_icons.py icons`.
+
 ## Run locally
 
 It's a static site with no build step:

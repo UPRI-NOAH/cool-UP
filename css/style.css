@@ -23,6 +23,11 @@
   --shadow-sm:   0 2px 8px rgba(0,0,0,0.12);
   --shadow-md:   0 4px 20px rgba(0,0,0,0.18);
   --topbar-h:    52px;
+  /* Notch / home-indicator insets (non-zero in installed iOS/Android apps) */
+  --safe-top:    env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left:   env(safe-area-inset-left, 0px);
+  --safe-right:  env(safe-area-inset-right, 0px);
 
   /* Category colours */
   --cat-green:   #2d8a4e;
@@ -39,6 +44,9 @@ html, body {
   color: var(--text);
   overflow: hidden;
   background: #e3ecef;
+  overscroll-behavior: none;              /* no pull-to-refresh / bounce over the map */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
 }
 
 /* ================================================================
@@ -56,7 +64,8 @@ html, body {
 #topbar {
   position: fixed;
   top: 0; left: 0; right: 0;
-  height: var(--topbar-h);
+  height: calc(var(--topbar-h) + var(--safe-top));
+  padding-top: var(--safe-top) !important;
   z-index: 500;
   background: var(--surface);
   box-shadow: var(--shadow-sm);
@@ -64,7 +73,7 @@ html, body {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 0 12px 0 16px;
+  padding: 0 calc(12px + var(--safe-right)) 0 calc(16px + var(--safe-left));
 }
 
 #topbar-title {
@@ -99,6 +108,7 @@ html, body {
 
 #campus-select {
   min-width: 0;
+  min-height: 36px;
   max-width: 46vw;
   padding: 6px 8px;
   font-size: 13px;
@@ -111,6 +121,8 @@ html, body {
 }
 
 .icon-btn {
+  min-width: 40px;
+  min-height: 40px;
   background: none;
   border: none;
   font-size: 20px;
@@ -125,7 +137,7 @@ html, body {
 /* ---- Search bar ---- */
 #search-bar {
   position: fixed;
-  top: var(--topbar-h);
+  top: calc(var(--topbar-h) + var(--safe-top));
   left: 0; right: 0;
   z-index: 490;
   padding: 8px 12px;
@@ -136,8 +148,8 @@ html, body {
 
 #search-input {
   width: 100%;
-  padding: 9px 14px;
-  font-size: 15px;
+  padding: 10px 14px;
+  font-size: 16px;                        /* 16px+ stops iOS zooming in on focus */
   border: 1.5px solid var(--border);
   border-radius: 8px;
   outline: none;
@@ -153,8 +165,9 @@ html, body {
   border: 1px solid var(--border);
   border-radius: 0 0 10px 10px;
   box-shadow: 0 6px 16px rgba(0,0,0,0.12);
-  max-height: 260px;
+  max-height: min(260px, 50vh);
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   z-index: 10;
 }
 
@@ -170,7 +183,7 @@ html, body {
 }
 
 .search-result-item {
-  padding: 10px 14px;
+  padding: 12px 14px;
   cursor: pointer;
   border-bottom: 1px solid #f0f0f0;
   font-size: 14px;
@@ -191,14 +204,20 @@ html, body {
 ================================================================ */
 #filters {
   position: fixed;
-  left: 0; right: 80px;
-  bottom: 24px;
+  left: 0; right: calc(80px + var(--safe-right));
+  bottom: calc(24px + var(--safe-bottom));
   z-index: 500;
   display: flex;
   gap: 8px;
-  padding: 0 12px;
+  padding: 4px calc(12px + var(--safe-left));
   overflow-x: auto;
   scrollbar-width: none;
+  scroll-snap-type: x proximity;
+  /* Fade the right edge so it's obvious the chip row scrolls */
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent);
+          mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent);
+  padding-right: 36px;
+  -webkit-overflow-scrolling: touch;
 }
 #filters::-webkit-scrollbar { display: none; }
 
@@ -207,7 +226,9 @@ html, body {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 12px;
+  min-height: 40px;
+  padding: 8px 14px;
+  scroll-snap-align: start;
   border-radius: 100px;
   border: 2px solid var(--chip-color, var(--brand-mid));
   background: var(--chip-color, var(--brand-mid));
@@ -236,8 +257,8 @@ html, body {
 ================================================================ */
 #btn-locate {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: calc(20px + var(--safe-bottom));
+  right: calc(20px + var(--safe-right));
   z-index: 500;
   width: 56px; height: 56px;
   border-radius: 50%;
@@ -273,6 +294,30 @@ html, body {
 .btn-primary:active { opacity: 0.85; }
 .btn-full { width: 100%; }
 
+.btn-outline {
+  background: white;
+  color: var(--brand-mid);
+  border: 1.5px solid var(--brand-mid);
+  border-radius: 8px;
+  padding: 11px 18px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-outline:hover { background: var(--brand-pale); }
+
+#install-box { margin-bottom: 12px; }
+.install-hint {
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: center;
+  color: var(--brand-dark);
+  background: var(--brand-pale);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
 /* ================================================================
    ABOUT MODAL (same card design as the pantry consent modal)
 ================================================================ */
@@ -284,7 +329,7 @@ html, body {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding: 16px;
+  padding: calc(16px + var(--safe-top)) 16px calc(16px + var(--safe-bottom));
 }
 @media (min-width: 769px) {
   #about-modal { align-items: center; }
@@ -296,8 +341,11 @@ html, body {
   padding: 28px 24px 24px;
   width: 100%;
   max-width: 440px;
-  max-height: calc(100vh - 32px);
+  max-height: calc(100vh - 32px - var(--safe-top) - var(--safe-bottom));
+  max-height: calc(100dvh - 32px - var(--safe-top) - var(--safe-bottom));
   overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   box-shadow: var(--shadow-md);
 }
 
@@ -384,7 +432,9 @@ html, body {
 ================================================================ */
 .toast {
   position: fixed;
-  bottom: 90px;
+  bottom: calc(90px + var(--safe-bottom));
+  max-width: calc(100vw - 32px);
+  text-align: center;
   left: 50%;
   transform: translateX(-50%);
   z-index: 900;
@@ -394,7 +444,6 @@ html, body {
   border-radius: 100px;
   font-size: 14px;
   font-weight: 500;
-  white-space: nowrap;
   box-shadow: var(--shadow-md);
   animation: toast-in 0.3s ease;
 }
@@ -411,9 +460,13 @@ html, body {
    LEAFLET OVERRIDES
 ================================================================ */
 .leaflet-top .leaflet-control-zoom {
-  margin-top: calc(var(--topbar-h) + 8px);
+  margin-top: calc(var(--topbar-h) + var(--safe-top) + 8px);
 }
-.leaflet-bottom.leaflet-right { margin-bottom: 84px; }
+.leaflet-bottom.leaflet-right { margin-bottom: calc(84px + var(--safe-bottom)); }
+/* Attribution: smaller on phones so it doesn't crowd the chips */
+@media (max-width: 480px) {
+  .leaflet-control-attribution { font-size: 9px; }
+}
 
 /* Heat-relief marker */
 .cool-pin {
@@ -515,7 +568,7 @@ html, body {
    DESKTOP
 ================================================================ */
 @media (min-width: 769px) {
-  .toast { bottom: 30px; }
+  .toast { bottom: calc(30px + var(--safe-bottom)); }
   #filters { right: 90px; padding-left: 16px; }
 }
 
@@ -526,7 +579,7 @@ html, body {
   #topbar-title .title-sub { font-size: 10px; }
   #topbar-actions { gap: 0; }
   #campus-select { max-width: 28vw; font-size: 12px; padding: 6px 4px; }
-  .icon-btn { font-size: 18px; padding: 4px 5px; }
+  .icon-btn { font-size: 18px; padding: 4px 5px; min-width: 38px; }
 }
 /* Very narrow phones: drop the tree icon, keep the title + El Niño line */
 @media (max-width: 380px) {

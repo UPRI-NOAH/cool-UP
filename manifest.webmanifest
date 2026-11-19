@@ -1,0 +1,20 @@
+{
+  "name": "Cool UP: Heat-Relief Map",
+  "short_name": "Cool UP",
+  "description": "Beat the heat this El Niño. Find parks, libraries, drinking water and shade around UP campuses.",
+  "id": "./",
+  "start_url": "./?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#e3ecef",
+  "theme_color": "#0b5d75",
+  "lang": "en",
+  "categories": ["navigation", "health", "education"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -9,11 +9,14 @@ const layersByType = new Map();   // cool_up:type → array of markers
 const activeTypes  = new Set(Object.keys(CONFIG.CATEGORIES));
 const places       = [];          // flattened features, for search
 let toastTimer = null;
+let deferredInstall = null;       // beforeinstallprompt event (Android / desktop Chrome)
+const isTouch = window.matchMedia('(pointer: coarse)').matches;
 
 document.addEventListener('DOMContentLoaded', () => {
   initMap();
   loadPlaces();
   setupUI();
+  setupPWA();
   maybeShowAbout();
 });
 
@@ -23,7 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function initMap() {
   const campus = CONFIG.CAMPUSES.find((c) => c.id === CONFIG.DEFAULT_CAMPUS);
-  map = L.map('map', { center: campus.center, zoom: campus.zoom, zoomControl: true });
+  // Touch devices pinch to zoom, so skip the +/- buttons there to free up space
+  map = L.map('map', { center: campus.center, zoom: campus.zoom, zoomControl: !isTouch });
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors',
@@ -55,7 +59,13 @@ function loadPlaces() {
       }),
       title: f.name || cat.label,
     });
-    marker.bindPopup(() => buildPopup(f, cat), { maxWidth: 280, className: 'cool-popup' });
+    marker.bindPopup(() => buildPopup(f, cat), {
+      maxWidth: Math.min(280, window.innerWidth - 48),
+      className: 'cool-popup',
+      // Keep popups clear of the top bar and the bottom chips/button
+      autoPanPaddingTopLeft: L.point(12, 80),
+      autoPanPaddingBottomRight: L.point(12, 100),
+    });
     layersByType.get(f.type).push(marker);
     places.push({ ...f, marker });
   });
@@ -316,6 +326,54 @@ function setupSearch() {
     if (!bar.contains(e.target) && e.target !== toggle) results.classList.add('hidden');
   });
 }
+
+// ================================================================
+//  PWA: service worker, install prompt, offline notice
+// ================================================================
+
+function setupPWA() {
+  if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+    navigator.serviceWorker.register('sw.js').catch((err) => console.warn('SW registration failed:', err));
+  }
+
+  const standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  if (standalone) return;   // already installed, nothing to offer
+
+  const box = document.getElementById('install-box');
+  const btn = document.getElementById('btn-install');
+  const iosHint = document.getElementById('install-ios');
+
+  // iOS Safari has no install prompt API, so show manual instructions instead
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (isIOS) {
+    btn.classList.add('hidden');
+    iosHint.classList.remove('hidden');
+    box.classList.remove('hidden');
+  }
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredInstall = e;
+    box.classList.remove('hidden');
+  });
+
+  btn.addEventListener('click', async () => {
+    if (!deferredInstall) return;
+    deferredInstall.prompt();
+    await deferredInstall.userChoice;
+    deferredInstall = null;
+    box.classList.add('hidden');
+  });
+
+  window.addEventListener('appinstalled', () => {
+    box.classList.add('hidden');
+    showToast('Cool UP installed! 🎉', 'success');
+  });
+}
+
+window.addEventListener('offline', () => showToast('You\'re offline. Showing saved map data.', 'info'));
+window.addEventListener('online',  () => showToast('Back online', 'success'));
 
 // ================================================================
 //  HELPERS
